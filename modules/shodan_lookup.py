@@ -23,14 +23,18 @@ class ShodanLookup:
         Initialise the Shodan client with an API key.
         """
         self.session = requests.Session()
-        # Path to the JSON API key configuration file in the user's home directory
-        self.config_file = os.path.expanduser('~/.osint_shodan_config')
+        # Path to the JSON API key configuration file
+        config_dir = os.path.expanduser('~/.config-vritrasecz')
+        self.config_file = os.path.join(config_dir, 'bloodrecon-shodan.json')
+        
+        # Create config directory if it doesn't exist
+        os.makedirs(config_dir, exist_ok=True)
+        
         # Determine the API key
         if api_key:
             self.api_key = api_key.strip()
             # Persist the provided key for future reuse
             self.save_api_key(self.api_key)
-            self.save_api_key_to_config_py(self.api_key)
         else:
             self.api_key = self.load_api_key()
         
@@ -43,9 +47,9 @@ class ShodanLookup:
         1. `SHODAN_API_KEY` environment variable.
         2. A `config.py` file residing in the same directory as this script and
            defining `SHODAN_API_KEY`.
-        3. A JSON config file stored in the user's home directory (`~/.osint_shodan_config`).
+        3. A JSON config file stored in `~/.config-vritrasecz/bloodrecon-shodan.json`.
         4. Interactive prompt requesting a new API key.  The new key is stored
-           in both config files so that future runs will not prompt again.
+           in the JSON config file so that future runs will not prompt again.
         """
         # 1. Environment variable override
         env_key = os.getenv('SHODAN_API_KEY')
@@ -65,19 +69,16 @@ class ShodanLookup:
             if new_key:
                 # Save and return the new key
                 self.save_api_key(new_key)
-                self.save_api_key_to_config_py(new_key)
                 return new_key
             return config_py_key.strip()
 
-        # 3. Load from JSON config file
+        # 3. Load from JSON config file (~/.config-vritrasecz/bloodrecon-shodan.json)
         if os.path.exists(self.config_file):
             try:
                 with open(self.config_file, 'r', encoding='utf-8') as file:
                     config = json.load(file)
                     api_key = config.get('api_key')
                     if api_key:
-                        # Save to config.py so user can see masked value next time
-                        self.save_api_key_to_config_py(api_key)
                         return api_key.strip()
             except (json.JSONDecodeError, IOError):
                 # Ignore and prompt user
@@ -87,7 +88,6 @@ class ShodanLookup:
         api_key = input(f"{Fore.YELLOW}[INPUT] Enter Shodan API key: {Style.RESET_ALL}").strip()
         if api_key:
             self.save_api_key(api_key)
-            self.save_api_key_to_config_py(api_key)
         return api_key
 
     def mask_key(self, key: str) -> str:
@@ -403,6 +403,32 @@ def search_shodan_query(query, api_key=None):
     shodan = ShodanLookup(api_key)
     shodan.search_shodan(query, "search")
 
+def set_shodan_api_key(api_key):
+    """Set Shodan API key directly without interactive mode"""
+    try:
+        if not api_key or not api_key.strip():
+            print(f"{Fore.RED}[ERROR] API key cannot be empty{Style.RESET_ALL}")
+            return False
+            
+        # Create config directory if it doesn't exist
+        config_dir = os.path.expanduser('~/.config-vritrasecz')
+        os.makedirs(config_dir, exist_ok=True)
+        
+        config_file = os.path.join(config_dir, 'bloodrecon-shodan.json')
+        
+        # Save the API key (will replace existing one if it exists)
+        with open(config_file, 'w') as file:
+            json.dump({'api_key': api_key.strip()}, file)
+            
+        print(f"\n{Fore.GREEN}[+] Shodan API key saved successfully!{Style.RESET_ALL}")
+        print(f"    {Fore.CYAN}Config location: {config_file}{Style.RESET_ALL}")
+            
+        return True
+        
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR] Failed to save API key: {str(e)}{Style.RESET_ALL}")
+        return False
+
 def provide_shodan_recommendations():
     """Provide recommendations for Shodan usage"""
     print(f"\n{Fore.GREEN}[+] Shodan Recommendations:{Style.RESET_ALL}")
@@ -422,4 +448,4 @@ def provide_shodan_recommendations():
     print(f"    {Fore.YELLOW}• vuln:CVE-2021-44228 - Hosts with specific vulnerabilities{Style.RESET_ALL}")
 
 # Export functions for use in main tool
-__all__ = ['ShodanLookup', 'search_shodan_host', 'search_shodan_query', 'provide_shodan_recommendations']
+__all__ = ['ShodanLookup', 'search_shodan_host', 'search_shodan_query', 'set_shodan_api_key', 'provide_shodan_recommendations']
