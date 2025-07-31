@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Termux-lightgrey.svg)](#compatibility)
-[![Version](https://img.shields.io/badge/version-1.0-brightgreen.svg)](#overview)
+[![Version](https://img.shields.io/badge/version-1.2.0-brightgreen.svg)](#overview)
 [![Status](https://img.shields.io/badge/status-stable-success.svg)](#overview)
 [![Maintained](https://img.shields.io/badge/maintained-yes-green.svg)](#contributing)
 [![Stars](https://img.shields.io/github/stars/VritraSecz/BloodRecon?style=social)](https://github.com/VritraSecz/BloodRecon)
@@ -22,6 +22,57 @@
   <h4>🩸 Blood is the Key 🩸</h4>
   <p>A comprehensive OSINT toolkit for cybersecurity professionals, penetration testers, bug bounty hunters, and digital forensics investigators.</p>
 </div>
+
+---
+
+## 🎉 What's New in v1.2.0
+
+### 🚀 Enhanced Shodan Integration
+
+We've completely revamped the Shodan integration with powerful new features that make API key management effortless!
+
+#### ✨ Key Improvements:
+
+**🔧 Command Line API Management**
+```bash
+# Set your Shodan API key instantly - no more interactive prompts!
+python3 bloodrecon.py --shodan-api "your_api_key_here"
+```
+
+**📁 Streamlined Configuration**
+- **New Location**: `~/.config-vritrasecz/bloodrecon-shodan.json`
+- **Auto Directory Creation**: Tool creates config directories automatically
+- **JSON-Only Storage**: Simplified, reliable configuration management
+
+**🔒 Smart API Key Handling**
+- **Automatic Replacement**: New API keys seamlessly replace existing ones
+- **Input Validation**: Enhanced validation prevents empty or invalid keys
+- **Better Error Messages**: Clear, actionable feedback for users
+
+**⚡ Improved User Experience**
+- **One-Command Setup**: Get Shodan running with a single command
+- **Non-Interactive Mode**: Perfect for automation and scripting
+- **Cleaner Output**: More intuitive and professional interface
+
+#### 🛠️ Quick Setup Example:
+```bash
+# 1. Set your API key (one time setup)
+python3 bloodrecon.py --shodan-api "your_shodan_api_key"
+
+# 2. Start using Shodan immediately
+python3 bloodrecon.py --shodan 8.8.8.8
+python3 bloodrecon.py --shodan google.com
+```
+
+> 💡 **Pro Tip**: Your API key is saved securely and will be used automatically for all future Shodan queries!
+
+**📋 What Changed:**
+- Moved from `~/.osint_shodan_config` to organized `~/.config-vritrasecz/` directory
+- Removed dual config.py file management for simplified workflow
+- Enhanced error handling and user feedback
+- Added `--shodan-api` command line argument
+
+**🔗 Get Started**: [View complete changelog](CHANGELOG.md) • [API Configuration Guide](#-api-key-configuration)
 
 ---
 
@@ -293,24 +344,61 @@ BloodRecon features 34+ specialized OSINT modules organized into categories:
 
 ## 🔑 API Key Configuration
 
-Some modules require API keys for enhanced functionality. Configure them in `modules/config.py`:
+Some modules require API keys for enhanced functionality. BloodRecon now offers multiple convenient ways to configure your API keys:
 
 ### Shodan API Key
 
-1. **Get your free API key** at [Shodan.io](https://account.shodan.io/register)
-2. **Configure the key** in `modules/config.py`:
+#### 🚀 **Recommended Method: Command Line Setup (v1.2.0+)**
 
+1. **Get your free API key** at [Shodan.io](https://account.shodan.io/register)
+2. **Set it instantly with one command**:
+
+```bash
+# Set your Shodan API key (replaces any existing key)
+python3 bloodrecon.py --shodan-api "your_shodan_api_key_here"
+```
+
+3. **Start using Shodan immediately**:
+
+```bash
+# Your API key is now saved and ready to use!
+python3 bloodrecon.py --shodan 8.8.8.8
+python3 bloodrecon.py --shodan google.com
+```
+
+#### 📁 **Configuration Details**
+- **Storage Location**: `~/.config-vritrasecz/bloodrecon-shodan.json`
+- **Auto Directory Creation**: Config directories are created automatically
+- **Key Replacement**: New keys seamlessly replace existing ones
+- **Persistent Storage**: API key is saved for all future sessions
+
+#### 🔄 **Alternative Methods**
+
+**Environment Variable:**
+```bash
+export SHODAN_API_KEY="your_api_key_here"
+python3 bloodrecon.py --shodan 8.8.8.8
+```
+
+**Legacy config.py (still supported):**
 ```python
+# modules/config.py
 SHODAN_API_KEY = 'your_shodan_api_key_here'
 ```
 
-3. **Alternative methods**:
-   - Set environment variable: `export SHODAN_API_KEY="your_key"`
-   - The tool will prompt for the key if not configured
+**Interactive Mode:**
+- The tool will prompt for the key if not configured
+- Entered keys are automatically saved for future use
 
 ### API Key Security
 
-⚠️ **Security Note**: Never commit API keys to version control. Consider using environment variables or secure key management systems in production environments.
+🔒 **Security Best Practices**:
+- ✅ Use the `--shodan-api` command for secure local storage
+- ✅ Use environment variables for server deployments
+- ❌ Never commit API keys to version control
+- ❌ Avoid hardcoding keys in scripts
+
+💡 **Pro Tip**: The new JSON config system in v1.2.0 provides the most reliable and user-friendly API key management!
 
 ---
 
@@ -330,6 +418,7 @@ BloodRecon/
 ├── 📄 requirements.txt          # Python dependencies
 ├── 📄 LICENSE                   # License File
 ├── 📄 README.md                 # This file
+├── 📄 CHANGELOG.md              # Version history and changes
 │
 └── 📁 modules/                  # OSINT modules directory
     ├── 📁 list-imp/             # Important list

@@ -23,7 +23,7 @@ from modules import (
     favicon_hash, asn_resolver, shodan_lookup, isp_tracker, maps_parser
 )
 
-VERSION = "1.0"
+VERSION = "1.2.0"
 AUTHOR = "Alex Butler [Vritra Security Organization]"
 TOOL_NAME = "BloodRecon"
 
@@ -42,7 +42,7 @@ def display_banner():
 ║  {ERROR}                    ⚡ OSINT Intelligence Framework ⚡                       {BANNER}          ║
 ║  {WARNING_TEXT}                         🩸 Blood is the Key 🩸                          {BANNER}              ║
 ║                                                                                         ║
-║  {VERSION_INFO}▶ Intelligence Reconnaissance & Analysis Framework v{VERSION}                                {BANNER}║
+║  {VERSION_INFO}▶ Intelligence Reconnaissance & Analysis Framework v{VERSION}                              {BANNER}║
 ║  {AUTHOR_INFO}▶ Developer: {MENU_HEADER}{AUTHOR}                                {BANNER}║
 ║  {WARNING_TEXT}▶ [DISCLAIMER] For Educational and Authorized Security Testing Only                    {BANNER}║
 ╚═════════════════════════════════════════════════════════════════════════════════════════╝{RESET_ALL}
@@ -381,6 +381,7 @@ Examples:
   {sys.argv[0]} --favicon https://example.com      # Generate favicon hash
   {sys.argv[0]} --asn AS15169                      # Resolve ASN to IP ranges
   {sys.argv[0]} --shodan 8.8.8.8                   # Perform Shodan search
+  {sys.argv[0]} --shodan-api "your_api_key_here"    # Set Shodan API key
   {sys.argv[0]} --isp 8.8.8.8                      # Track IP to ISP information
   {sys.argv[0]} --maps "https://maps.google.com/..." # Parse Google Maps links
   {sys.argv[0]} --about                            # Show detailed tool information
@@ -430,6 +431,7 @@ Version: {VERSION}
     parser.add_argument('--favicon', help='Generate favicon hash for website')
     parser.add_argument('--asn', help='Resolve ASN to IP ranges')
     parser.add_argument('--shodan', help='Shodan search (requires API key)')
+    parser.add_argument('--shodan-api', help='Set Shodan API key (saves to config file)')
     parser.add_argument('--isp', help='Track IP to ISP information')
     parser.add_argument('--maps', help='Parse Google Maps links')
     args = parser.parse_args()
@@ -507,6 +509,8 @@ Version: {VERSION}
         favicon_hash.generate_favicon_hash(args.favicon)
     elif args.asn:
         asn_resolver.resolve_asn_to_ranges(args.asn)
+    elif args.shodan_api:
+        shodan_lookup.set_shodan_api_key(args.shodan_api)
     elif args.shodan:
         shodan_lookup.search_shodan_host(args.shodan)
 #        handle_shodan_lookup(args.shodan)
